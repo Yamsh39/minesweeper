@@ -5,7 +5,7 @@ const Home = () => {
     <div className={styles.container}>
       <main className={styles.main}>
         <div className={styles.hoge}/>
-
+        <div>hello</div>
       </main>
     </div>
   );
