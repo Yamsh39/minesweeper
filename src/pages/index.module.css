@@ -8,16 +8,26 @@
   padding: 0 0.5rem;
 }
 
-.main {
+.map {
+  width: 270px;
+  height: 270px;
   display: flex;
-  flex: 1;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  padding: 5rem 0;
+  background: #dcdcdc;
 }
 
-.hoge{
+.cell {
+  border: solid 1px black;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign {
   width: 30px;
   height: 30px;
   background: url('~/assets/images/icons.png') no-repeat;
