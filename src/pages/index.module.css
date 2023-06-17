@@ -15,7 +15,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  background: #dcdcdc;
+  background: #c0c0c0;
 }
 
 .cell {
@@ -25,6 +25,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 4px 4px 3px #fff inset, -4px -4px 3px #808080 inset;
 }
 
 .sign {
