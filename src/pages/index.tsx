@@ -128,6 +128,7 @@ const Home = () => {
     console.log(newBombMap.flat().filter((n) => n === 1).length);
   };
 
+  //returnないでboardを参照しているのにboardでuseStateを使わないとなるとどのように値を保持すればよいのか
   return (
     <div className={styles.container}>
       <div className={styles.map}>
@@ -141,9 +142,7 @@ const Home = () => {
                 isPlaying
                   ? {
                       boxShadow:
-                        0 > num && num > 8
-                          ? '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset'
-                          : '0 0',
+                        num === -1 ? '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' : '0 0',
                     }
                   : { boxShadow: '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' }
               }
