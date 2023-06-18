@@ -30,6 +30,7 @@ const Home = () => {
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
   ];
   //-1はあけられてない状態、0が空白,1~8が数,9は?、10は旗
+  //-1:未開封, 0:空, 1~8:隣接するボムの数, 9:疑問マーク, 10:旗マーク, 11:ボム
   //いったん保存
   // [1, 2, 3, 4, 5, 6, 7, 8, 9],
   // [10, 11, 12, 13, 14, 0, 0, 0, 0],
@@ -45,6 +46,9 @@ const Home = () => {
   const isFailure = userInputs.some((row, y) =>
     row.some((input, x) => input === 1 && bombMap[y][x] === 1)
   );
+  const updatedBoard = bombMap.map((row, y) =>
+    row.map((input, x) => (input === 1 ? 10 : board[y][x]))
+  );
   // let zeroList: { x: number; y: number }[];
   // let playCount = 0;
   const directions = [
@@ -57,37 +61,32 @@ const Home = () => {
     [0, 1],
     [-1, 1],
   ];
-  //x,yの周りのボムの数
+  //空白連鎖
   const check8 = (x: number, y: number) => {
     let bombCount = 0;
     for (const direction of directions) {
-      let newX = x + direction[0];
-      let newY = y + direction[1];
+      const newX = x + direction[0];
+      const newY = y + direction[1];
       if (
         bombMap[newY] !== undefined &&
         bombMap[newY][newX] !== undefined &&
-        bombMap[newY][newX] === 1
+        bombMap[newY][newX] === 0
       ) {
-        bombCount += 1;
+        board[newY][newX] = 0;
+        check8(newX, newY);
       }
     }
     return bombCount;
   };
-
+  //x,yの周りのボムの数
   const checkBombNum = () => {
-    let bombCount = 0;
     for (let x = 0; x < bombMap.length; x++) {
       for (let y = 0; y < bombMap[x].length; y++) {
-        if (newUserInputs[y][x] === 1) {
-          if (board[y][x] === 0) {
-            for (let direction of directions) {
-              let newX = x + direction[0];
-              let newY = y + direction[1];
-              board[newY][newX] = check8(newX, newY);
-            }
+        if (newUserInputs[y][x] === 1 && board[y][x] === 0) {
+          for (let direction of directions) {
+            const bombCount = check8(x, y);
+            board[y][x] = bombCount;
           }
-          board[y][x] = bombCount;
-          bombCount = 0;
         }
       }
     }
@@ -95,14 +94,14 @@ const Home = () => {
   //１から9をランダムに生成する
   const getRandom = () => Math.floor(Math.random() * 9);
   //ボム生成
-  const firstRandom = () => {
+  const bombRandom = () => {
     let newX = getRandom();
     let newY = getRandom();
     if (newBombMap[newY][newX] === 1) {
-      firstRandom();
+      bombRandom();
     } else {
-      console.log('newxy', newX, newY);
       newBombMap[newY][newX] = 1;
+      board[newY][newX] = 10;
     }
   };
   //computed→計算値
@@ -111,12 +110,13 @@ const Home = () => {
     if (isPlaying === false) {
       newBombMap[y][x] = 1;
       for (let n = 0; n < 10; n++) {
-        firstRandom();
+        bombRandom();
       }
       newBombMap[y][x] = 0;
       setBombMap(newBombMap);
     }
     console.log('x,y', x, y);
+    //ゲームが終了しているかの確認
     if (bombMap[y] !== undefined && bombMap[y][x] !== undefined && isFailure) {
       console.log('game over');
     }
