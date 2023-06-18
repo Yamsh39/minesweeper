@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './index.module.css';
-const normalBorad: 0[][] = [
+const normalBoard: 0[][] = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -12,10 +12,10 @@ const normalBorad: 0[][] = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
 const Home = () => {
-  const [userInputs, setUserInputs] = useState<(0 | 1 | 2 | 3)[][]>(normalBorad);
+  const [userInputs, setUserInputs] = useState<(0 | 1 | 2 | 3)[][]>(normalBoard);
   const newUserInputs: (0 | 1 | 2 | 3)[][] = JSON.parse(JSON.stringify(userInputs));
   //0はなし,1は左,2は旗,3は?
-  const [bombMap, setBombMap] = useState<(0 | 1)[][]>(normalBorad);
+  const [bombMap, setBombMap] = useState<(0 | 1)[][]>(normalBoard);
   const newBombMap: (0 | 1)[][] = JSON.parse(JSON.stringify(bombMap));
   //1がボム,0が安置
   const board: number[][] = [
@@ -29,6 +29,7 @@ const Home = () => {
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
   ];
+  //-1はあけられてない状態、0が空白,1~8が数,9は?、10は旗
   //いったん保存
   // [1, 2, 3, 4, 5, 6, 7, 8, 9],
   // [10, 11, 12, 13, 14, 0, 0, 0, 0],
@@ -44,8 +45,8 @@ const Home = () => {
   const isFailure = userInputs.some((row, y) =>
     row.some((input, x) => input === 1 && bombMap[y][x] === 1)
   );
-  let zeroList: { x: number; y: number }[];
-  let playCount = 0;
+  // let zeroList: { x: number; y: number }[];
+  // let playCount = 0;
   const directions = [
     [-1, 0],
     [-1, -1],
