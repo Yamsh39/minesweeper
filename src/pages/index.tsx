@@ -63,7 +63,7 @@ const Home = () => {
   ];
   //空白連鎖
   const check8 = (x: number, y: number) => {
-    let bombCount = 0;
+    const bombCount = 0;
     for (const direction of directions) {
       const newX = x + direction[0];
       const newY = y + direction[1];
@@ -83,9 +83,11 @@ const Home = () => {
     for (let x = 0; x < bombMap.length; x++) {
       for (let y = 0; y < bombMap[x].length; y++) {
         if (newUserInputs[y][x] === 1 && board[y][x] === 0) {
-          for (let direction of directions) {
-            const bombCount = check8(x, y);
-            board[y][x] = bombCount;
+          for (const direction of directions) {
+            const newX = direction[0] + x;
+            const newY = direction[1] + y;
+            const bombCount = check8(newX, newY);
+            board[newY][newX] = bombCount;
           }
         }
       }
@@ -95,8 +97,8 @@ const Home = () => {
   const getRandom = () => Math.floor(Math.random() * 9);
   //ボム生成
   const bombRandom = () => {
-    let newX = getRandom();
-    let newY = getRandom();
+    const newX = getRandom();
+    const newY = getRandom();
     if (newBombMap[newY][newX] === 1) {
       bombRandom();
     } else {
