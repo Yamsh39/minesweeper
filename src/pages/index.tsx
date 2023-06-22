@@ -12,6 +12,7 @@ const normalBoard: 0[][] = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
+
 const Home = () => {
   const [userInputs, setUserInputs] = useState<(0 | 1 | 2 | 3)[][]>(normalBoard);
   const newUserInputs: (0 | 1 | 2 | 3)[][] = JSON.parse(JSON.stringify(userInputs));
@@ -116,6 +117,17 @@ const Home = () => {
     }
   };
 
+  const finishCheck = () => {
+    console.log('game over');
+    bombMap.map((row, y) => {
+      row.map((value, x) => {
+        if (value === 1) {
+          board[y][x] = 11;
+        }
+      });
+    });
+  };
+
   const onClick = (x: number, y: number) => {
     newUserInputs[y][x] = 1;
     setUserInputs(newUserInputs);
@@ -133,24 +145,33 @@ const Home = () => {
     }
     console.log('x,y', x, y);
     //ゲームが終了しているかの確認
-    if (isFailure) {
-      console.log('game over');
-      bombMap.map((row, y) => {
-        row.map((value, x) => {
-          if (value === 1) {
-            board[y][x] = 11;
-          }
-        });
-      });
-    }
   };
 
   checkBoard();
   // boardUpdate();
-  console.table(newBombMap);
+  console.table(bombMap);
   console.table(board);
   console.log(isPlaying);
   console.log(newBombMap.flat().filter(Boolean).length);
+  let count = 0;
+  const handleContextMenu = (x: number, y: number) => (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (!isFailure) {
+      if (count === 0) {
+        board[y][x] = 12;
+        count = 1;
+        console.log('1');
+      } else if (count === 1) {
+        board[y][x] = 13;
+        count = 2;
+        console.log('2');
+      } else if (count === 2) {
+        board[y][x] = -1;
+        count = 0;
+        console.log('3');
+      }
+    }
+  };
   return (
     <div className={styles.container}>
       <div className={styles.map}>
@@ -159,16 +180,15 @@ const Home = () => {
             <div
               className={styles.cell}
               key={`${x}-${y}`}
-              onClick={isFailure ? undefined : () => onClick(x, y)}
+              onClick={isFailure ? () => finishCheck : () => onClick(x, y)}
+              onContextMenu={handleContextMenu(x, y)}
               style={
-                isPlaying
-                  ? {
+                num === 11
+                  ? { boxShadow: '0 0' }
+                  : {
                       boxShadow:
-                        (!isFailure && num === 11) || num === -1
-                          ? '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset'
-                          : '0 0',
+                        num === -1 ? '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' : '0 0',
                     }
-                  : { boxShadow: '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' }
               }
             >
               {/* {board[y][x]} */}
