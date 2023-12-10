@@ -16,7 +16,7 @@ const normalBoard: 0[][] = [
 const Home = () => {
   const [userInputs, setUserInputs] = useState<(0 | 1 | 2 | 3)[][]>(normalBoard);
   const newUserInputs: (0 | 1 | 2 | 3)[][] = JSON.parse(JSON.stringify(userInputs));
-  //0はなし,1は左,2は旗,3は?
+  //0はなし,1は左,2は旗,3は?,4はボムを触った
   const [bombMap, setBombMap] = useState<(0 | 1)[][]>(normalBoard);
   const newBombMap: (0 | 1)[][] = JSON.parse(JSON.stringify(bombMap));
   //1がボム,0が安置
@@ -31,7 +31,6 @@ const Home = () => {
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
   ];
-  //-1はあけられてない状態、0が空白,1~8が数,9は?、10は旗
   //-1:未開封, 0:空, 1~8:隣接するボムの数, 9:疑問マーク, 10:旗マーク, 11:ボム
   const isPlaying = bombMap.some((row) => row.includes(1));
   const isFailure = userInputs.some((row, y) =>
@@ -47,25 +46,6 @@ const Home = () => {
     [0, 1],
     [-1, 1],
   ];
-  //都度boardを更新
-  // const boardUpdate = () => {
-  //   bombMap.map((row, y) => {
-  //     row.map((value, x) => {
-  //       if (value === 1) {
-  //         board[y][x] = 11;
-  //       }
-  //     });
-  //   });
-  //   userInputs.map((row, y) => {
-  //     row.map((value, x) => {
-  //       if (value === 2) {
-  //         board[y][x] = 9;
-  //       } else if (value === 3) {
-  //         board[y][x] = 10;
-  //       }
-  //     });
-  //   });
-  // };
 
   //周りのボムの数の探索
   const check8 = (x: number, y: number) => {
@@ -117,17 +97,6 @@ const Home = () => {
     }
   };
 
-  const finishCheck = () => {
-    console.log('game over');
-    bombMap.map((row, y) => {
-      row.map((value, x) => {
-        if (value === 1) {
-          board[y][x] = 11;
-        }
-      });
-    });
-  };
-
   const onClick = (x: number, y: number) => {
     newUserInputs[y][x] = 1;
     setUserInputs(newUserInputs);
@@ -147,31 +116,60 @@ const Home = () => {
     //ゲームが終了しているかの確認
   };
 
-  checkBoard();
-  // boardUpdate();
-  console.table(bombMap);
-  console.table(board);
-  console.log(isPlaying);
-  console.log(newBombMap.flat().filter(Boolean).length);
-  let count = 0;
   const handleContextMenu = (x: number, y: number) => (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (!isFailure) {
-      if (count === 0) {
-        board[y][x] = 12;
-        count = 1;
-        console.log('1');
-      } else if (count === 1) {
-        board[y][x] = 13;
-        count = 2;
-        console.log('2');
-      } else if (count === 2) {
-        board[y][x] = -1;
-        count = 0;
-        console.log('3');
+      if (event.button === 2) {
+        if (userInputs[y][x] === 0) {
+          console.log('a');
+          newUserInputs[y][x] = 2;
+        } else if (userInputs[y][x] === 2) {
+          console.log('b');
+          newUserInputs[y][x] = 3;
+        } else if (userInputs[y][x] === 3) {
+          console.log('c');
+          newUserInputs[y][x] = 0;
+        }
       }
+      setUserInputs(newUserInputs);
     }
   };
+
+  const finishCheck = () => {
+    console.log('game over');
+    bombMap.map((row, y) => {
+      row.map((value, x) => {
+        if (value === 1) {
+          board[y][x] = 11;
+        }
+      });
+    });
+  };
+
+  // 都度boardを更新;
+  const boardUpdate = () => {
+    if (isFailure) {
+      finishCheck();
+    }
+    userInputs.map((row, y) => {
+      row.map((value, x) => {
+        if (value === 2) {
+          board[y][x] = 10;
+        } else if (value === 3) {
+          board[y][x] = 9;
+        }
+      });
+    });
+  };
+
+  checkBoard();
+  boardUpdate();
+  // console.table(bombMap);
+  console.table(board);
+  console.table(userInputs);
+  console.log(isPlaying);
+  // console.log(newBombMap.flat().filter(Boolean).length);
+
   return (
     <div className={styles.container}>
       <div className={styles.map}>
@@ -180,15 +178,14 @@ const Home = () => {
             <div
               className={styles.cell}
               key={`${x}-${y}`}
-              onClick={isFailure ? () => finishCheck : () => onClick(x, y)}
+              onClick={isFailure ? () => finishCheck() : () => onClick(x, y)}
               onContextMenu={handleContextMenu(x, y)}
               style={
-                num === 11
-                  ? { boxShadow: '0 0' }
-                  : {
-                      boxShadow:
-                        num === -1 ? '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' : '0 0',
-                    }
+                num === -1
+                  ? { boxShadow: '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' }
+                  : isPlaying && (num === 9 || num === 10)
+                  ? { boxShadow: '4px 4px 3px #fff inset, -4px -4px 3px #808080 inset' }
+                  : { boxShadow: '0 0' }
               }
             >
               {/* {board[y][x]} */}
